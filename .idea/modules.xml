@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/dash.js/dash.js.iml" filepath="$PROJECT_DIR$/dash.js/dash.js.iml" />
+      <module fileurl="file://$PROJECT_DIR$/deployment/deployment.iml" filepath="$PROJECT_DIR$/deployment/deployment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/load-generator/load-generator.iml" filepath="$PROJECT_DIR$/load-generator/load-generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/metrics-collector/metrics-collector.iml" filepath="$PROJECT_DIR$/metrics-collector/metrics-collector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/video-server-ykn.iml" filepath="$PROJECT_DIR$/.idea/video-server-ykn.iml" />
+      <module fileurl="file://$PROJECT_DIR$/videomanagement/videomanagement.iml" filepath="$PROJECT_DIR$/videomanagement/videomanagement.iml" />
+      <module fileurl="file://$PROJECT_DIR$/videoprocessing/videoprocessing.iml" filepath="$PROJECT_DIR$/videoprocessing/videoprocessing.iml" />
+    </modules>
+  </component>
+</project>
