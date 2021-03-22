@@ -1,0 +1,18 @@
+[submodule "dash.js"]
+	path = dash.js
+	url = ../dash.js
+[submodule "metrics-collector"]
+	path = metrics-collector
+	url = ../metrics-collector
+[submodule "deployment"]
+	path = deployment
+	url = ../deployment
+[submodule "load-generator"]
+	path = load-generator
+	url = ../load-generator
+[submodule "videomanagement"]
+	path = videomanagement
+	url = ../videomanagement
+[submodule "videoprocessing"]
+	path = videoprocessing
+	url = ../videoprocessing
