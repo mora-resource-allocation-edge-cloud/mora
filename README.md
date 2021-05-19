@@ -40,13 +40,16 @@ It will build the containers and will use volumes to mount the code within them.
 
 For the Golang micro-service it will also generate the swagger documentation and support live-reloading when code changes.
 
-## Add a fake video in the repository
+## Add a video in the repository
 First, we will add a user "test".
 Use a software like GetIt, and launch a POST request for https://cloud-vms-1.particles.dieei.unict.it:8080/vms/register
 In the body, select JSON and add {"username":"test", password:"test123"}.
 
-Now, let's add a video.
+Now, let's add a video. First we add the metainformation. To this aim, follow the instructions above.
+.....
 
+Then, we copy and paste the id of the video whose metadata were inserted as above, and we upload the video file. To this aim, follow the instructions above.
+.....
 
 ## Load Generator
 
