@@ -114,6 +114,70 @@ helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --di
 The last option is needed beacause some of the OpenShift objects are not part of the OpenApi specifications.
 
 
+## Installation of the application using helm with minikube (Cloud only)
+Req:...
+In the cloud Virtual Machine (VM)
+```bash
+    cd deployment/
+```
+1. Check for values in configuration files. 
+   * In vp-cloud/values.yaml:
+        * isCloud: "true"
+        * isOpenShift: false
+    ...
+2. Install the application using helm 
+```bash
+helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
+```
+The last option is needed because some of the OpenShift objects are not part of the OpenApi specifications.
+
+3. Ingress are not started automatically after creation. An ingress controller has to be enabled for this purpose.
+
+```bash
+   minikube addons enable ingress
+```
+## VM accessibility from the client
+...
+1. The application exposes specific URLs declared in values.yaml and values.cloud.yaml (cloudURL and edgeURL).
+These URL has to be resolved to ip address in the client machine.
+   To do so : 
+```bash
+   sudo echo "$VM_ip     $cloudURL">>/etc/hosts
+```
+   where: 
+   * $VM_ip is the ip address of the VM (Where the cloud application is installed)
+   * $cloudURL is the url exposed by the ingress (declared in values.yaml and values.cloud.yaml). If not changed :  cloud-vms-1.master.particles.dieei.unict.it
+
+2. The ingress is accessible at the port 80 of the minikube ip. Requests coming to the VM have to be redirected to this address. 
+   To do so, you can use IPtables and proceed as following 
+```bash
+iptables -t nat -A PREROUTING -p tcp -i $int --dport 8080 -j DNAT --to-destination $minikube_ip:80
+```
+Where:
+* $int is the name of the VM interface linked to the client 
+* $minikube_ip is the ip address used by minikube. To show it you can do:
+```bash
+  minikube ip 
+```
+Now requests coming to the VM at the port 8080 will be redirected to the port 80 of minikube ip where the ingress is listening. 
+
+The application should be accessible now.
+
+Test: 
+```bash
+   curl http://$cloudURL:8080
+```
+Expected answer:
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>nginx/1.15.5</center>
+</body>
+</html>
+
+
+
 ### OpenShift or Kubernetes 
 
 If you deploy on Kubernetes you have to set in the values.yaml:
@@ -203,67 +267,7 @@ Example of commands to build the dev load generator:
     docker build -t aleskandro/mora-load-generator:debug-latest . -f loadgen-chrome.Dockerfile  # Build the container
     docker run -p 9222-9350 -it -v $(pwd):/go/src/load-generator aleskandro/mora-load-generator:debug-latest bash 
 ```
-## Installation of the application using helm with minikube (Cloud only)
-Req:...
-In the cloud Virtual Machine (VM)
-```bash
-    cd deployment/
-```
-1. Check for values in configuration files. 
-   * In vp-cloud/values.yaml:
-        * isCloud: "true"
-        * isOpenShift: false
-    ...
-2. Install the application using helm 
-```bash
-helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
-```
-The last option is needed because some of the OpenShift objects are not part of the OpenApi specifications.
 
-3. Ingress are not started automatically after creation. An ingress controller has to be enabled for this purpose.
-
-```bash
-   minikube addons enable ingress
-```
-## VM accessibility from the client
-...
-1. The application exposes specific URLs declared in values.yaml and values.cloud.yaml (cloudURL and edgeURL).
-These URL has to be resolved to ip address in the client machine.
-   To do so : 
-```bash
-   sudo echo "$VM_ip     $cloudURL">>/etc/hosts
-```
-   where: 
-   * $VM_ip is the ip address of the VM (Where the cloud application is installed)
-   * $cloudURL is the url exposed by the ingress (declared in values.yaml and values.cloud.yaml). If not changed :  cloud-vms-1.master.particles.dieei.unict.it
-
-2. The ingress is accessible at the port 80 of the minikube ip. Requests coming to the VM have to be redirected to this address. 
-   To do so, you can use IPtables and proceed as following 
-```bash
-iptables -t nat -A PREROUTING -p tcp -i $int --dport 8080 -j DNAT --to-destination $minikube_ip:80
-```
-Where:
-* $int is the name of the VM interface linked to the client 
-* $minikube_ip is the ip address used by minikube. To show it you can do:
-```bash
-  minikube ip 
-```
-Now requests coming to the VM at the port 8080 will be redirected to the port 80 of minikube ip where the ingress is listening. 
-
-The application should be accessible now.
-
-Test: 
-```bash
-   curl http://$cloudURL:8080
-```
-Expected answer:
-<html>
-<head><title>404 Not Found</title></head>
-<body>
-<center><h1>404 Not Found</h1></center>
-<hr><center>nginx/1.15.5</center>
-</body>
-</html>
 
 
 # TODOs
