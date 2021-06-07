@@ -7,6 +7,122 @@
 - videomanagement ==> video management micro-service
 - videprocessing ==> micro-service to encode raw videos
 
+
+# The (fake) video service provider
+
+The video service provider consists of a MVC-based architecture with:
+
+1. An API Gateway
+1. A video management service (vms) responsible for the metadata of available video and for the HTTP/REST management of the service
+1. A Mongo DB to store video metadata and authentication data
+1. Two volumes: one for the raw videos and one for the encoded ones
+1. A video processing service (vps) that encode the video using a strategy depending on the running variant of the video service (see below)
+1. Kafka as a  message broker to make communication between the vms and the vps
+
+
+## Add a video in the repository
+Use a software like GetIt, or Postman (Instructions are adapted to GetIt )
+
+will consider that cloudURL has the default value: https://cloud-vms-1.particles.dieei.unict.it
+1. First, we will add a user "test":
+   
+        launch a POST request for http://cloud-vms-1.master.particles.dieei.unict.it:8080/vms/register
+   
+        In the body, select RAW, JSON and add the content: {"username":"test", "password":"test123"}.
+
+
+2. Now, let's add a video. First we add the metainformation (name and author). To this aim, follow the instructions above. 
+   
+        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it:8080/vms/videos 
+   
+    where test is the username and test123 is the password corresponding. 
+   
+        In the body, select RAW, Json and add the content:  {"name": "my video", "author": "test"}
+
+
+Answer
+{
+"name" : "my video",
+"author" : "test",
+"_id" : "60a92624819d2f0a7709a0d3",
+"status" : "WaitingUpload",
+"user" : "60a92589819d2f0a7709a0d2"
+}
+
+Then, we copy and paste the id of the video whose metadata were inserted as above, and we upload the video file. 
+
+3. finaly we can upload the video file. To this aim, follow the instructions above. 
+   
+        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it:8080/vms/videos/$content_id
+    Where    $content_id is ...
+
+        In the body select Form Data, Add Key Value Pair and add the following: Key=file and instead of text clique on data and choose your video
+max size
+The video is uploaded....
+Errors: Time out 
+## Variants and options
+
+As in \[TODO put ref\], the video service provider can be configured to run as the Whole (to run as a Cloud service) 
+or in part (i.e. onto the Edge) to guarantee offloading of computation and network loads.... TODO: Continue me.
+
+The deployment of the system is implemented for Kubernetes and OpenShift by exploiting helm v3.
+
+Three value files are available at the current time:
+
+1. Cloud variant
+1. (Edge) Cache variant: it will just run the api gateway, the vms and the mongodb. When a video is asked to the this service, it will
+ check if the video is locally available. If yes, it will reply to the user; otherwise it will redirect the user to the cloud and will
+ download the video from the cloud for next requests. The maximum number of available video at the edge can be set by limiting 
+ a mongo capped collection
+1. (Offline) encoding variant: it will also run Kafka and the vps in order to allow the edge video service to retrieve the raw video when needed (as above)
+    and encoding it. Also in this case, the first time a video is downloaded from the Cloud, the user will also reach the cloud to play the video. When the 
+    encoding of the video in the edge is completed, the users will play that video directly from the edge without generating any traffic to the cloud: the capped collection is set as above to retain a maximum number of videos leveraging the LRU policy to clean the 'cache'.
+
+
+## Management of requests between the cloud and the edge
+
+In order to allow users to reach the Cloud or the Edge transparently (i.e., without giving him any knowledge of the actual uris to use), a
+principle similar to the one offered by the Netflix OpenConnect appliances is used. A Load balancer at the Edge is able to redirect the users
+to the internal (at the edge) micro-service or the Cloud service by setting parameters as the maximum number of concurrent users that can be served by the Edge.
+
+
+
+## Building the containers
+
+```bash
+cd videomanagement/
+docker build -t aleskandro/video-server:cloud-vms -f Dockerfile.production .
+cd ../
+cd videprocessing
+docker build -t aleskandro/video-server:cloud-vps -f Dockerfile . 
+
+cd helm/docker/gateway
+docker build -t aleskandro/video-server:cloud-gateway -f Dockerfile . 
+
+cd helm/docker/load-balancer
+docker build -t aleskandro/video-server:edge-lb -f Dockerfile .
+```
+
+## Deployment with helm
+
+Set your values.yaml file (look at variants/*.yml and helm/vp-cloud/values.yaml) and, after the configuration of the Kuberntes/Openshift env:
+
+```bash
+helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
+```
+
+The last option is needed beacause some of the OpenShift objects are not part of the OpenApi specifications.
+
+
+### OpenShift or Kubernetes 
+
+If you deploy on Kubernetes you have to set in the values.yaml:
+
+```yaml
+isOpenShift: false
+```
+
+
 # Docker environments
 
 ## Metrics collector
@@ -149,119 +265,6 @@ Expected answer:
 </body>
 </html>
 
-# The (fake) video service provider
-
-The video service provider consists of a MVC-based architecture with:
-
-1. An API Gateway
-1. A video management service (vms) responsible for the metadata of available video and for the HTTP/REST management of the service
-1. A Mongo DB to store video metadata and authentication data
-1. Two volumes: one for the raw videos and one for the encoded ones
-1. A video processing service (vps) that encode the video using a strategy depending on the running variant of the video service (see below)
-1. Kafka as a  message broker to make communication between the vms and the vps
-
-
-## Add a video in the repository
-Use a software like GetIt, or Postman (Instructions are adapted to GetIt )
-
-will consider that cloudURL has the default value: https://cloud-vms-1.particles.dieei.unict.it
-1. First, we will add a user "test":
-   
-        launch a POST request for http://cloud-vms-1.master.particles.dieei.unict.it:8080/vms/register
-   
-        In the body, select RAW, JSON and add the content: {"username":"test", "password":"test123"}.
-
-
-2. Now, let's add a video. First we add the metainformation (name and author). To this aim, follow the instructions above. 
-   
-        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it:8080/vms/videos 
-   
-    where test is the username and test123 is the password corresponding. 
-   
-        In the body, select RAW, Json and add the content:  {"name": "my video", "author": "test"}
-
-
-Answer
-{
-"name" : "my video",
-"author" : "test",
-"_id" : "60a92624819d2f0a7709a0d3",
-"status" : "WaitingUpload",
-"user" : "60a92589819d2f0a7709a0d2"
-}
-
-Then, we copy and paste the id of the video whose metadata were inserted as above, and we upload the video file. 
-
-3. finaly we can upload the video file. To this aim, follow the instructions above. 
-   
-        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it:8080/vms/videos/$content_id
-    Where    $content_id is ...
-
-        In the body select Form Data, Add Key Value Pair and add the following: Key=file and instead of text clique on data and choose your video
-max size
-The video is uploaded....
-Errors: Time out 
-## Variants and options
-
-As in \[TODO put ref\], the video service provider can be configured to run as the Whole (to run as a Cloud service) 
-or in part (i.e. onto the Edge) to guarantee offloading of computation and network loads.... TODO: Continue me.
-
-The deployment of the system is implemented for Kubernetes and OpenShift by exploiting helm v3.
-
-Three value files are available at the current time:
-
-1. Cloud variant
-1. (Edge) Cache variant: it will just run the api gateway, the vms and the mongodb. When a video is asked to the this service, it will
- check if the video is locally available. If yes, it will reply to the user; otherwise it will redirect the user to the cloud and will
- download the video from the cloud for next requests. The maximum number of available video at the edge can be set by limiting 
- a mongo capped collection
-1. (Offline) encoding variant: it will also run Kafka and the vps in order to allow the edge video service to retrieve the raw video when needed (as above)
-    and encoding it. Also in this case, the first time a video is downloaded from the Cloud, the user will also reach the cloud to play the video. When the 
-    encoding of the video in the edge is completed, the users will play that video directly from the edge without generating any traffic to the cloud: the capped collection is set as above to retain a maximum number of videos leveraging the LRU policy to clean the 'cache'.
-
-
-## Management of requests between the cloud and the edge
-
-In order to allow users to reach the Cloud or the Edge transparently (i.e., without giving him any knowledge of the actual uris to use), a
-principle similar to the one offered by the Netflix OpenConnect appliances is used. A Load balancer at the Edge is able to redirect the users
-to the internal (at the edge) micro-service or the Cloud service by setting parameters as the maximum number of concurrent users that can be served by the Edge.
-
-
-
-## Building the containers
-
-```bash
-cd videomanagement/
-docker build -t aleskandro/video-server:cloud-vms -f Dockerfile.production .
-cd ../
-cd videprocessing
-docker build -t aleskandro/video-server:cloud-vps -f Dockerfile . 
-
-cd helm/docker/gateway
-docker build -t aleskandro/video-server:cloud-gateway -f Dockerfile . 
-
-cd helm/docker/load-balancer
-docker build -t aleskandro/video-server:edge-lb -f Dockerfile .
-```
-
-## Deployment with helm
-
-Set your values.yaml file (look at variants/*.yml and helm/vp-cloud/values.yaml) and, after the configuration of the Kuberntes/Openshift env:
-
-```bash
-helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
-```
-
-The last option is needed beacause some of the OpenShift objects are not part of the OpenApi specifications.
-
-
-### OpenShift or Kubernetes 
-
-If you deploy on Kubernetes you have to set in the values.yaml:
-
-```yaml
-isOpenShift: false
-```
 
 # TODOs
 
