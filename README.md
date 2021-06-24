@@ -1,3 +1,6 @@
+# Clone
+git clone --recursive git@github.com:mora-resource-allocation-edge-cloud/mora.git
+
 # Micro-services/Repositories
 
 - dash.js ==> client: it is a form from https://github.com/Dash-Industry-Forum/dash.js
