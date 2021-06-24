@@ -118,14 +118,9 @@ The deployment of the system is implemented for Kubernetes and OpenShift by expl
 
 Three value files are available at the current time:
 
-1. Cloud variant
-1. (Edge) Cache variant: it will just run the api gateway, the vms and the mongodb. When a video is asked to the this service, it will
- check if the video is locally available. If yes, it will reply to the user; otherwise it will redirect the user to the cloud and will
- download the video from the cloud for next requests. The maximum number of available video at the edge can be set by limiting 
- a mongo capped collection
-1. (Offline) encoding variant: it will also run Kafka and the vps in order to allow the edge video service to retrieve the raw video when needed (as above)
-    and encoding it. Also in this case, the first time a video is downloaded from the Cloud, the user will also reach the cloud to play the video. When the 
-    encoding of the video in the edge is completed, the users will play that video directly from the edge without generating any traffic to the cloud: the capped collection is set as above to retain a maximum number of videos leveraging the LRU policy to clean the 'cache'.
+1. Cloud variant: All the application is run in this variant.
+2. (Edge) Cache variant: it will just run the api gateway, the vms and the mongodb. When a video is asked to this service, it will  check if the video is locally available. If yes, it will reply to the user; otherwise it will redirect the user to the cloud and will  download the video from the cloud for next requests. The maximum number of available video at the edge can be set by limiting a mongo capped collection
+3. (Offline) encoding variant: it will also run Kafka and the vps in order to allow the edge video service to retrieve the raw video when needed (as above) and encoding it. Also in this case, the first time a video is downloaded from the Cloud, the user will also reach the cloud to play the video. When the encoding of the video in the edge is completed, the users will play that video directly from the edge without generating any traffic to the cloud: the capped collection is set as above to retain a maximum number of videos leveraging the LRU policy to clean the 'cache'.
 
 
 ## Management of requests between the cloud and the edge
