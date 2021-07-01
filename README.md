@@ -94,35 +94,17 @@ principle similar to the one offered by the Netflix OpenConnect appliances is us
 to the internal (at the edge) micro-service or the Cloud service by setting parameters as the maximum number of concurrent users that can be served by the Edge.
 
 
+## Set up and first run (simple Cloud only variant)
+We will now explain how to set up a simple distributed video service, as in the figure [@zazim13]
+We will have a virtual machine (VM) hosting a Kubernates cluster with the Cloud variant inside. The client will be a separated machine, i.e., your laptop.
 
-## Building the containers
+### Deployment
 
-```bash
-cd videomanagement/
-docker build -t aleskandro/video-server:cloud-vms -f Dockerfile.production .
-cd ../
-cd videprocessing
-docker build -t aleskandro/video-server:cloud-vps -f Dockerfile . 
-
-cd helm/docker/gateway
-docker build -t aleskandro/video-server:cloud-gateway -f Dockerfile . 
-
-cd helm/docker/load-balancer
-docker build -t aleskandro/video-server:edge-lb -f Dockerfile .
-```
-
-## Deployment with helm
-
-Set your values.yaml file (look at variants/*.yml and helm/vp-cloud/values.yaml) and, after the configuration of the Kuberntes/Openshift env:
-
-```bash
-helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
-```
-
-The last option is needed beacause some of the OpenShift objects are not part of the OpenApi specifications.
+You can deploy the applications with different Kubernates falvors. The easiest one is Minikube.
 
 
-## Installation of the application using helm with minikube (Cloud only)
+#### Deployment with minikube
+
 Req:...
 In the cloud Virtual Machine (VM)
 ```bash
@@ -144,7 +126,45 @@ The last option is needed because some of the OpenShift objects are not part of 
 ```bash
    minikube addons enable ingress
 ```
-## VM accessibility from the client
+
+
+#### Without Minikube
+Skip this if you are using Minikube.
+##### Building without minikube
+```bash
+cd videomanagement/
+docker build -t aleskandro/video-server:cloud-vms -f Dockerfile.production .
+cd ../
+cd videprocessing
+docker build -t aleskandro/video-server:cloud-vps -f Dockerfile . 
+
+cd helm/docker/gateway
+docker build -t aleskandro/video-server:cloud-gateway -f Dockerfile . 
+
+cd helm/docker/load-balancer
+docker build -t aleskandro/video-server:edge-lb -f Dockerfile .
+```
+
+##### Deployment with helm without minikube
+
+
+If you deploy on Kubernetes you have to set in the values.yaml:
+
+```yaml
+isOpenShift: false
+```
+
+Set your values.yaml file (look at variants/*.yml and helm/vp-cloud/values.yaml) and, after the configuration of the Kuberntes/Openshift env:
+
+```bash
+helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
+```
+
+The last option is needed beacause some of the OpenShift objects are not part of the OpenApi specifications.
+
+
+
+### VM accessibility from the client
 ...
 1. The application exposes specific URLs declared in values.yaml and values.cloud.yaml (cloudURL and edgeURL).
 These URL has to be resolved to ip address in the client machine.
@@ -186,13 +206,7 @@ Expected answer:
 
 
 
-### OpenShift or Kubernetes 
 
-If you deploy on Kubernetes you have to set in the values.yaml:
-
-```yaml
-isOpenShift: false
-```
 
 
 # Docker environments
