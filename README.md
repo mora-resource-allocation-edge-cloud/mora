@@ -81,6 +81,11 @@ Three value files are available at the current time:
     and encoding it. Also in this case, the first time a video is downloaded from the Cloud, the user will also reach the cloud to play the video. When the 
     encoding of the video in the edge is completed, the users will play that video directly from the edge without generating any traffic to the cloud: the capped collection is set as above to retain a maximum number of videos leveraging the LRU policy to clean the 'cache'.
 
+aa: Where can the Cloud variant be deployed? In the cloud VM or edge VM or both?
+aa: Where can the Cache variant be deployed? In the edge node only, right?
+aa: Where can the Encoding variant be deployed? In the edge node only, right?
+aa: Please, write per each variant where we think they should be deployed.
+
 
 ## Management of requests between the cloud and the edge
 
