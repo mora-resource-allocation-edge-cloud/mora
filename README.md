@@ -197,6 +197,7 @@ Test:
    curl http://$cloudURL:8080
 ```
 Expected answer:
+```
 <html>
 <head><title>404 Not Found</title></head>
 <body>
@@ -204,7 +205,7 @@ Expected answer:
 <hr><center>nginx/1.15.5</center>
 </body>
 </html>
-
+```
 
 
 
