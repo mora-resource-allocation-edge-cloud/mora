@@ -148,7 +148,7 @@ docker build -t aleskandro/video-server:edge-lb -f Dockerfile .
 ##### Deployment with helm without minikube
 
 ###### isOpenShift
-If you deploy on Kubernetes you have to set in the values.yaml:
+If you deploy on "vanilla" Kubernetes you have to set in the values.yaml:
 
 ```yaml
 isOpenShift: false
