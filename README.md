@@ -29,40 +29,35 @@ Use a software like GetIt, or Postman (Instructions are adapted to GetIt )
 will consider that cloudURL has the default value: https://cloud-vms-1.particles.dieei.unict.it
 1. First, we will add a user "test":
    
-        launch a POST request for http://cloud-vms-1.master.particles.dieei.unict.it:8080/vms/register
+        launch a POST request for http://cloud-vms-1.master.particles.dieei.unict.it/vms/register
    
         In the body, select RAW, JSON and add the content: {"username":"test", "password":"test123"}.
 
 
-2. Now, let's add a video. First we add the metainformation (name and author). To this aim, follow the instructions above. 
+2. Now, let's add a video. First we add the meta information (name and author). To this aim, follow the instructions above. 
    
-        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it:8080/vms/videos 
+        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it/vms/videos 
    
     where test is the username and test123 is the password corresponding. 
    
         In the body, select RAW, Json and add the content:  {"name": "my video", "author": "test"}
 
+From the answer keep the value of the key _id. This value is needed in order upload the video file ($content_id). 
 
-Answer
-{
-"name" : "my video",
-"author" : "test",
-"_id" : "60a92624819d2f0a7709a0d3",
-"status" : "WaitingUpload",
-"user" : "60a92589819d2f0a7709a0d2"
-}
-
-Then, we copy and paste the id of the video whose metadata were inserted as above, and we upload the video file. 
-
-3. finaly we can upload the video file. To this aim, follow the instructions above. 
+3. finally, we can upload the video file. To this aim, follow the instructions above.
    
-        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it:8080/vms/videos/$content_id
-    Where    $content_id is ...
+        launch a POST request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it/vms/videos/$content_id
+
+where $content_id is defined in the previous point.  
 
         In the body select Form Data, Add Key Value Pair and add the following: Key=file and instead of text clique on data and choose your video
-max size
-The video is uploaded....
-Errors: Time out 
+
+## Retrieve a video 
+In order to download a video
+
+    launch a Get request for http://test:test123@cloud-vms-1.master.particles.dieei.unict.it/vms/videos/$content_id
+
+
 ## Variants and options
 
 As in \[TODO put ref\], the video service provider can be configured to run as the Whole (to run as a Cloud service) 
@@ -105,8 +100,22 @@ You can deploy the applications with different Kubernates falvors. The easiest o
 
 #### Deployment with minikube
 
-Req:...
+Requirement:
+-Docker 
+
+-Minikube
+
+-kubectl
+
+-helm
+
+-One Virtual Machine (VM) to host the cloud cluster
+
+-The client: Another VM or your own pc  
+
 In the cloud Virtual Machine (VM)
+Clone the project first see section Clone. 
+Then do the following
 ```bash
     cd deployment/
 ```
@@ -114,7 +123,7 @@ In the cloud Virtual Machine (VM)
    * In vp-cloud/values.yaml:
         * isCloud: "true"
         * isOpenShift: false
-    ...
+
 2. Install the application using helm 
 ```bash
 helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
@@ -166,35 +175,48 @@ The last option is needed beacause some of the OpenShift objects are not part of
 
 
 ### VM accessibility from the client
-...
+
 1. The application exposes specific URLs declared in values.yaml and values.cloud.yaml (cloudURL and edgeURL).
-These URL has to be resolved to ip address in the client machine.
-   To do so : 
+These URLs have to be resolved to ip address in the client machine. In this case the hostname cloudURL has to be added to the client hostname mapping. 
+   
+To do so, you can add this line
+```bash
+$VM_ip     $cloudURL
+```
+   to the file /etc/hosts.
+
+   where: 
+   * $VM_ip is the ip address of the VM (Where the cloud cluster is running)
+   * $cloudURL is the url exposed by the ingress (declared in values.yaml and values.cloud.yaml). If not changed :  cloud-vms-1.master.particles.dieei.unict.it
+     
+
+You can use this command to do so:
 ```bash
    sudo echo "$VM_ip     $cloudURL">>/etc/hosts
 ```
-   where: 
-   * $VM_ip is the ip address of the VM (Where the cloud application is installed)
-   * $cloudURL is the url exposed by the ingress (declared in values.yaml and values.cloud.yaml). If not changed :  cloud-vms-1.master.particles.dieei.unict.it
 
-2. The ingress is accessible at the port 80 of the minikube ip. Requests coming to the VM have to be redirected to this address. 
+2. The ingress is accessible at the port 80 of minikube ip. Requests coming to the VM have to be redirected to this address. 
    To do so, you can use IPtables and proceed as following 
 ```bash
-iptables -t nat -A PREROUTING -p tcp -i $int --dport 8080 -j DNAT --to-destination $minikube_ip:80
+iptables -t nat -A PREROUTING -p tcp -i $int --dport 80 -j DNAT --to-destination $minikube_ip:80
 ```
 Where:
-* $int is the name of the VM interface linked to the client 
+* $int is the name of the VM interface linked to the client. 
 * $minikube_ip is the ip address used by minikube. To show it you can do:
 ```bash
   minikube ip 
 ```
-Now requests coming to the VM at the port 8080 will be redirected to the port 80 of minikube ip where the ingress is listening. 
+Caution: 
+
+--dport has to be 80. Otherwise some redirection may not work. 
+
+Now requests coming to the VM at the port 80 will be redirected to the port 80 of minikube ip where the ingress is listening. 
 
 The application should be accessible now.
 
 Test: 
 ```bash
-   curl http://$cloudURL:8080
+   curl http://$cloudURL
 ```
 Expected answer:
 ```
