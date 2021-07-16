@@ -243,7 +243,18 @@ Requirement:
 
 #### Deployment with minikube
 
+In the edge Virtual Machine (VM)
+Clone the project first see section Clone. 
+Then do the following
+```bash
+    cd deployment/
+```
+1. Check for values in configuration files. 
+   * In vp-cloud/values.yaml:
+        * isCloud: "false"
+        * isOpenShift: false
 
+2. Install the application using helm 
 ###### Installation
 Installing cache variant
 From deployment directory this command will deploy the cache variant. 
