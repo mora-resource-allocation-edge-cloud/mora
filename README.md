@@ -128,7 +128,7 @@ Then do the following
 
 2. Install the application using helm 
 ```bash
-helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
+helm install vp-cloud -f variants/values.cloud.yaml --generate-name --disable-openapi-validation
 ```
 The last option is needed because some of the OpenShift objects are not part of the OpenApi specifications.
 
