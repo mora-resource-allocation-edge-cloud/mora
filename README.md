@@ -23,6 +23,8 @@ The video service provider consists of a MVC-based architecture with:
 1. Kafka as a  message broker to make communication between the vms and the vps
 
 
+!!!!!!!! WRITE HERE HOW TO DEPLOY THE CLOUD AND TO SET UP THE CLIENT IN ORDER TO REACH THE CLOUD
+
 ## Add a video in the repository
 Use a software like GetIt, or Postman (Instructions are adapted to GetIt )
 
