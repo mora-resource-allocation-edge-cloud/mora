@@ -167,7 +167,7 @@ isOpenShift: false
 Set your values.yaml file (look at variants/*.yml and helm/vp-cloud/values.yaml) and, after the configuration of the Kuberntes/Openshift env:
 
 ```bash
-helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
+helm install vp-cloud -f variants/values.cloud.yaml --generate-name --disable-openapi-validation
 ```
 
 The last option is needed beacause some of the OpenShift objects are not part of the OpenApi specifications.
@@ -181,18 +181,17 @@ These URLs have to be resolved to ip address in the client machine. In this case
    
 To do so, you can add this line
 ```bash
-$VM_ip     $cloudURL
+$VM_ip     $exposedURL
 ```
    to the file /etc/hosts.
 
    where: 
    * $VM_ip is the ip address of the VM (Where the cloud cluster is running)
-   * $cloudURL is the url exposed by the ingress (declared in values.yaml and values.cloud.yaml). If not changed :  cloud-vms-1.master.particles.dieei.unict.it
-     
+   * $exposedURL is the url exposed by the ingress (declared in values.yaml and values.cloud.yaml)
 
 You can use this command to do so:
 ```bash
-   sudo echo "$VM_ip     $cloudURL">>/etc/hosts
+   sudo echo "$VM_ip     $exposedURL">>/etc/hosts
 ```
 
 2. The ingress is accessible at the port 80 of minikube ip. Requests coming to the VM have to be redirected to this address. 
@@ -216,7 +215,7 @@ The application should be accessible now.
 
 Test: 
 ```bash
-   curl http://$cloudURL
+   curl http://$exposedURL
 ```
 Expected answer:
 ```
@@ -230,7 +229,26 @@ Expected answer:
 ```
 
 
+## Set up run ( Edge clusters)
+We will now explain how to set up a simple distributed video service, as in the figure [@zazim13] We will have a virtual machine (VM) hosting a Kubernates cluster with the edge variant inside.
+The client will be a separated machine, i.e., your laptop.
 
+Requirement: 
+
+- 
+
+- ...
+
+#### Deployment with minikube
+
+
+###### Installation
+Installing cache variant
+From deployment directory this command will deploy the cache variant. 
+```bash
+helm install vp-cloud -f variants/values.cache-variant.yaml --generate-name --disable-openapi-validation
+```
+Then you can solve the VM accessibility from the client
 
 
 # Docker environments
