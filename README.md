@@ -1,7 +1,7 @@
 ## WARNING 
 
-The following document could be outdated. Please refer to the [wiki for further information](https://github.
-com/mora-resource-allocation-edge-cloud/mora/wiki)
+The following document could be outdated. Please refer to the 
+[wiki for further information](https://github.com/mora-resource-allocation-edge-cloud/mora/wiki)
 
 # Micro-services/Repositories
 
