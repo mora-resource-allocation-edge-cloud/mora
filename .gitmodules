@@ -16,3 +16,6 @@
 [submodule "videoprocessing"]
 	path = videoprocessing
 	url = ../videoprocessing
+[submodule "mora.wiki"]
+	path = mora.wiki
+	url = ../mora.wiki.git
