@@ -60,7 +60,7 @@ cloud.
 2. Online encoding variant: as in the offline encoding variant, a miss leads to the download of the raw
    representation of the video. In this  case, however, the encoding of the video is not persisted on the disk but is provided online when requests for that video come.
 
-![illustration - Cloud only](https://github.com/mora-resource-allocation-edge-cloud/mora/blob//illustrations/Cloud%20only.PNG)
+![illustration - Cloud only](https://github.com/mora-resource-allocation-edge-cloud/mora/raw/development/illustrations/cloud%20and%20edge.png)
 
 ## Management of requests between the cloud and the edge
 
