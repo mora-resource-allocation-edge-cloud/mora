@@ -3,9 +3,10 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dash.js" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deployment" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/load-generator" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/metrics-collector" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/deployment" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/mora.wiki" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/videomanagement" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/videoprocessing" vcs="Git" />
   </component>
